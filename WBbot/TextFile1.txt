@@ -1,0 +1,11 @@
+﻿CREATE TABLE "Users" (
+	"Count"	INTEGER,
+	"Name"	TEXT,
+	"First_name"	TEXT,
+	"Second_name"	TEXT,
+	"Id"	INTEGER NOT NULL UNIQUE,
+	"Date_insert"	TEXT,
+	"Active"	INTEGER,
+	PRIMARY KEY("Count" AUTOINCREMENT)
+);
+
