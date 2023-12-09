@@ -34,22 +34,35 @@ namespace WBbot
 
         }
 
-        public async void SendMessage()
+        public async Task SendMessage()
         {
-            
-            var resp = GetRequest();
-            
-            var orders = JsonConvert.DeserializeObject<Orders>(resp).orders;
-            
-            if (orders != null & orders.Count ==0) { return; }
-            string message = "Было заказано\n";
-            foreach (var order in orders) {
+            int coolDown = 1000 * 60 * 30;
+            long count = 1;
+            while (true)
+            {
+                var resp = GetRequest();
 
-                message += this.keyValuePairs[order.skus[0]]+"\n";
+                var orders = JsonConvert.DeserializeObject<Orders>(resp).orders;
+
+                if (orders != null & orders.Count == 0)
+                { await Console.Out.WriteLineAsync($"Проверка наличия новых заказов № {count++} ({DateTime.Now.ToString("G")})"); }
+                else
+                {
+                    string message = "Было заказано:\n";
+                    foreach (var order in orders)
+                    {
+
+                        message += this.keyValuePairs[order.skus[0]] + "\tСтоимость: " + order.price + "\n Дата покупки: " + order.createdAt + "\n";
+                    }
+                    await this.botClient.SendTextMessageAsync("370802502", message);
+                    await this.botClient.SendTextMessageAsync("388867563", message);
+                    Thread.Sleep(coolDown);
+                }
+                Thread.Sleep(3000);
+
             }
-            await this.botClient.SendTextMessageAsync("370802502", message);
 
-            
+
 
 
         }

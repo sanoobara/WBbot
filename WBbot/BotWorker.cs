@@ -65,7 +65,7 @@ namespace WBbot
                         if (message.Text == "/start")
                         {
                            await Starting(user);
-                            Console.WriteLine("start");
+                            await Console.Out.WriteLineAsync("456");
                         }
 
 

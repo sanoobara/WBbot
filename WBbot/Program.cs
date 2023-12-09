@@ -13,6 +13,6 @@ Console.WriteLine($"Start listening for @{me.Username}");
 
 
 APIWild wild = new APIWild(configuration.WildberriesToken, botWorker.botClient);
-wild.SendMessage();
+await wild.SendMessage();
 Console.ReadLine();
 cts.Cancel();
