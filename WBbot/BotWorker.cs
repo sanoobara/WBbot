@@ -10,11 +10,14 @@ namespace WBbot
     {
 
         public TelegramBotClient botClient;
+        DBWorker dBWorker;
 
-        public BotWorker(string Token, CancellationTokenSource cts)
+        public BotWorker(string Token, CancellationTokenSource cts, string connectionString)
         {
 
             botClient = new TelegramBotClient(Token);
+
+            dBWorker = new DBWorker(connectionString);
 
 
 
@@ -34,9 +37,9 @@ namespace WBbot
         }
 
 
-        void Starting()
+        async void Starting(User user)
         {
-
+            await dBWorker.AddUser(user.Username, user.Id, user.FirstName, user.LastName);
         }
 
 
@@ -53,7 +56,7 @@ namespace WBbot
 
                         if (message.Text == "/start")
                         {
-                            s
+                            Starting(user);
                         }
 
 

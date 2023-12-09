@@ -10,26 +10,29 @@ namespace WBbot
         public DBWorker(string connectionString)
         {
             this.connectionString = connectionString;
+            SQLitePCL.raw.SetProvider(new SQLitePCL.SQLite3Provider_e_sqlite3());
 
         }
 
-        async Task AddUser(string userName, string userId)
+        public async Task AddUser(string userName, long userId, string userFirstName, string userSecondName)
         {
             await using (var connection = new SqliteConnection(this.connectionString))
             {
+
                 connection.Open();
+                
                 string sqlExpression = "INSERT INTO Users (Name, First_name, Second_name, Id, Date_insert, Active) VALUES (@Name, @First_name, @Second_name, @Id, @Date_insert, @Active)";
                 SqliteCommand command = new SqliteCommand(sqlExpression, connection);
                 // создаем параметр для сообщения
-                SqliteParameter messageParam = new SqliteParameter("@Name", messageText);
-                command.Parameters.Add(messageParam);
-                // создаем параметр для возраста
-                SqliteParameter dateParam = new SqliteParameter("@First_name", message.Date.ToString("g"));
-                command.Parameters.Add(dateParam);
-                SqliteParameter id_userParam = new SqliteParameter("@id_user", message.From.Id);
-                command.Parameters.Add(id_userParam);
-                SqliteParameter nik_nameParam = new SqliteParameter("@nik_name", message.From.Username);
-                command.Parameters.Add(nik_nameParam);
+                
+                command.Parameters.Add(new SqliteParameter("@Name", userName));
+                command.Parameters.Add(new SqliteParameter("@First_name", userFirstName));
+                command.Parameters.Add(new SqliteParameter("@Second_name", userSecondName.ToString()));
+                command.Parameters.Add(new SqliteParameter("@Id", userId));
+                command.Parameters.Add(new SqliteParameter("@Date_Insert", DateTime.Now.ToString("g")));
+                command.Parameters.Add(new SqliteParameter("@Active", 1));
+                int i = command.ExecuteNonQuery();
+                await Console.Out.WriteLineAsync("Chel dobavlen");
 
             }
         }
