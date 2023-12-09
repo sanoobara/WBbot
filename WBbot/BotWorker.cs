@@ -37,9 +37,17 @@ namespace WBbot
         }
 
 
-        async void Starting(User user)
+        async Task Starting(User user)
         {
-            await dBWorker.AddUser(user.Username, user.Id, user.FirstName, user.LastName);
+            if (user.LastName is null)
+            {
+                await dBWorker.AddUser(user.Username, user.Id, user.FirstName);
+            }
+            else
+            {
+                await dBWorker.AddUser(user.Username, user.Id, user.FirstName, user.LastName);
+            }
+          
         }
 
 
@@ -56,7 +64,8 @@ namespace WBbot
 
                         if (message.Text == "/start")
                         {
-                            Starting(user);
+                           await Starting(user);
+                            Console.WriteLine("start");
                         }
 
 

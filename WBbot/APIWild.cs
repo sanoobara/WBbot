@@ -1,37 +1,60 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using Telegram.Bot;
 namespace WBbot
 {
     internal class APIWild
     {
         string Token;
         const string Url = "https://suppliers-api.wildberries.ru/api/v3/orders/new";
-
-
-
-        public APIWild(string token)
+        Dictionary<string, string> keyValuePairs;
+        TelegramBotClient botClient;
+        public APIWild(string token, TelegramBotClient botClient)
         {
             this.Token = token;
-
+            this.botClient = botClient;
+            using (StreamReader sr = new StreamReader("Barcode.json")) {
+                this.keyValuePairs = JsonConvert.DeserializeObject<Dictionary<string, string>>(sr.ReadToEnd());
+            }
+            
 
         }
-
-        public string GetRequest()
+       
+        private string GetRequest()
         {
             using (var client = new HttpClient())
             {
 
                 client.DefaultRequestHeaders.Add("Authorization", this.Token);
                 var response = client.GetStringAsync(Url).Result;
-                Orders orders = JsonConvert.DeserializeObject<Orders>(response);
-
-
+               
                 return response;
-
 
             }
 
+        }
+
+        public async void SendMessage()
+        {
+            
+            var resp = GetRequest();
+            
+            var orders = JsonConvert.DeserializeObject<Orders>(resp).orders;
+            
+            if (orders != null & orders.Count ==0) { return; }
+            string message = "Было заказано\n";
+            foreach (var order in orders) {
+
+                message += this.keyValuePairs[order.skus[0]]+"\n";
+            }
+            await this.botClient.SendTextMessageAsync("370802502", message);
+
+            
+
 
         }
+
+
     }
 
     public class Order

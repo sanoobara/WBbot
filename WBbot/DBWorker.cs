@@ -27,15 +27,38 @@ namespace WBbot
                 
                 command.Parameters.Add(new SqliteParameter("@Name", userName));
                 command.Parameters.Add(new SqliteParameter("@First_name", userFirstName));
-                command.Parameters.Add(new SqliteParameter("@Second_name", userSecondName.ToString()));
+                command.Parameters.Add(new SqliteParameter("@Second_name", userSecondName));
                 command.Parameters.Add(new SqliteParameter("@Id", userId));
-                command.Parameters.Add(new SqliteParameter("@Date_Insert", DateTime.Now.ToString("g")));
+                command.Parameters.Add(new SqliteParameter("@Date_insert", DateTime.Now.ToString("g")));
                 command.Parameters.Add(new SqliteParameter("@Active", 1));
-                int i = command.ExecuteNonQuery();
-                await Console.Out.WriteLineAsync("Chel dobavlen");
+               command.ExecuteNonQuery();
+               
 
             }
         }
+
+        public async Task AddUser(string userName, long userId, string userFirstName)
+        {
+            await using (var connection = new SqliteConnection(this.connectionString))
+            {
+
+                connection.Open();
+
+                string sqlExpression = "INSERT OR IGNORE INTO Users (Name, First_name, Id, Date_insert, Active) VALUES (@Name, @First_name,  @Id, @Date_insert, @Active)";
+                SqliteCommand command = new SqliteCommand(sqlExpression, connection);
+                // создаем параметр для сообщения
+
+                command.Parameters.Add(new SqliteParameter("@Name", userName));
+                command.Parameters.Add(new SqliteParameter("@First_name", userFirstName));
+                command.Parameters.Add(new SqliteParameter("@Id", userId));
+                command.Parameters.Add(new SqliteParameter("@Date_insert", DateTime.Now.ToString("g")));
+                command.Parameters.Add(new SqliteParameter("@Active", 1));
+                command.ExecuteNonQuery();
+
+
+            }
+        }
+
 
 
     }
