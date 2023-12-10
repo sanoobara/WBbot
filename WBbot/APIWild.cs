@@ -52,7 +52,7 @@ namespace WBbot
                     foreach (var order in orders)
                     {
 
-                        message += this.keyValuePairs[order.skus[0]] + "\tСтоимость: " + order.price + "\n Дата покупки: " + order.createdAt + "\n";
+                        message += this.keyValuePairs[order.skus[0]] + "\tСтоимость: " + order.price/100 + " рублей\n Дата покупки: " + order.createdAt.AddHours(3) + "\n";
                     }
                     await this.botClient.SendTextMessageAsync("370802502", message);
                     await this.botClient.SendTextMessageAsync("388867563", message);
