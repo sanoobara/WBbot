@@ -6,6 +6,7 @@ namespace WBbot
 
         public string TelegramToken { get; }
         public string WildberriesToken { get; }
+        public string WildberriesTokenStat { get; }
         public string ConnectionStrings { get; }
 
 
@@ -16,6 +17,7 @@ namespace WBbot
             Iconfiguration = builder.Build();
             this.TelegramToken = Iconfiguration["TelegramToken"];
             this.WildberriesToken = Iconfiguration["WildberriesToken"];
+            this.WildberriesTokenStat = Iconfiguration["WildberriesTokenStat"];
             this.ConnectionStrings = Iconfiguration["ConnectionStrings"];
 
         }

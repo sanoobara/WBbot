@@ -1,6 +1,7 @@
 ﻿
 using Telegram.Bot;
 using WBbot;
+using WBbot.Wildberries;
 
 Configuration configuration = new Configuration();
 
@@ -12,7 +13,9 @@ var me = await botWorker.botClient.GetMeAsync();
 Console.WriteLine($"Start listening for @{me.Username}");
 
 
-APIWild wild = new APIWild(configuration.WildberriesToken, botWorker.botClient);
+APIWild wild = new APIWild(configuration.WildberriesToken, configuration.WildberriesTokenStat, botWorker.botClient);
 await wild.SendMessage();
+//await wild.SendStat();
+
 Console.ReadLine();
 cts.Cancel();
