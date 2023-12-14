@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -25,7 +23,7 @@ namespace WBbot
             botClient = new TelegramBotClient(Token);
             this.cts = cts;
             dBWorker = new DBWorker(connectionString);
-            
+
 
 
             // StartReceiving does not block the caller thread. Receiving is done on the ThreadPool.
@@ -54,14 +52,14 @@ namespace WBbot
             {
                 await dBWorker.AddUser(user.Username, user.Id, user.FirstName, user.LastName);
             }
-          
+
         }
 
 
         async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
 
-            // Only process Message updates: https://core.telegram.org/bots/api#message
+           
             switch (update.Type)
             {
                 case UpdateType.Message:
@@ -71,9 +69,9 @@ namespace WBbot
 
                         if (message.Text == "/start")
                         {
-                           await Starting(user);
+                            await Starting(user);
                             GetTestKeyboard(message);
-                           
+
                         }
 
 
@@ -87,25 +85,28 @@ namespace WBbot
                         if (message.Data == "Месяц")
                         {
                             var s = await APIStat.SendReport(DateTime.UtcNow.AddDays(-30), DateTime.UtcNow);
-                            await botClient.SendTextMessageAsync("370802502", s);
+                           // await botClient.SendTextMessageAsync("370802502", s);
                             break;
                         }
                         if (message.Data == "остатки")
                         {
-                            var s = await APIStat.GetStoks();
-                            await botClient.SendTextMessageAsync("370802502", s);
+                            var s = await APIStat.GetStocks();
+                            await botClient.SendTextMessageAsync(user.Id, s);
+                            //await botClient.SendTextMessageAsync("388867563", s);
                             break;
                         }
                         if (message.Data == "incomes")
                         {
                             var s = await APIStat.GetIncomes();
-                            await botClient.SendTextMessageAsync("370802502", s);
+                            await botClient.SendTextMessageAsync(user.Id, s);
+                            //await botClient.SendTextMessageAsync("388867563", s);
                             break;
                         }
                         if (message.Data == "get_stat_order")
                         {
                             var s = await APIStat.GetAllOrders(DateTime.Now.AddDays(-7));
-                            await botClient.SendTextMessageAsync("370802502", s);
+                            await botClient.SendTextMessageAsync(user.Id, s);
+                            //await botClient.SendTextMessageAsync("388867563", s);
                             break;
                         }
 
@@ -126,7 +127,7 @@ namespace WBbot
 
             }
 
-            async void GetTestKeyboard(Message message)
+            async Task GetTestKeyboard(Message message)
             {
                 DateTime dateTime = DateTime.Now;
 
@@ -135,16 +136,16 @@ namespace WBbot
             // first row
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: dateTime.AddDays(-1).ToString("d"), callbackData: dateTime.AddDays(-1).ToString("d")),
-                InlineKeyboardButton.WithCallbackData(text: dateTime.AddDays(-3).ToString("d"), callbackData: dateTime.AddDays(-3).ToString("d")),
+                //InlineKeyboardButton.WithCallbackData(text: dateTime.AddDays(-1).ToString("d"), callbackData: dateTime.AddDays(-1).ToString("d")),
+                //InlineKeyboardButton.WithCallbackData(text: dateTime.AddDays(-3).ToString("d"), callbackData: dateTime.AddDays(-3).ToString("d")),
                 InlineKeyboardButton.WithCallbackData(text: "Отчет", callbackData: "Месяц"),
                 InlineKeyboardButton.WithCallbackData(text: "Остатки", callbackData: "остатки"),
-                
+
             },
             new []
             {
                 InlineKeyboardButton.WithCallbackData(text: "stat_order", callbackData: "get_stat_order"),
-                
+
             },
             });
 

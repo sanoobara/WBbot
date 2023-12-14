@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.Sqlite;
-using Telegram.Bot.Types;
 
 namespace WBbot
 {
@@ -20,19 +19,19 @@ namespace WBbot
             {
 
                 connection.Open();
-                
+
                 string sqlExpression = "INSERT INTO Users (Name, First_name, Second_name, Id, Date_insert, Active) VALUES (@Name, @First_name, @Second_name, @Id, @Date_insert, @Active)";
                 SqliteCommand command = new SqliteCommand(sqlExpression, connection);
                 // создаем параметр для сообщения
-                
+
                 command.Parameters.Add(new SqliteParameter("@Name", userName));
                 command.Parameters.Add(new SqliteParameter("@First_name", userFirstName));
                 command.Parameters.Add(new SqliteParameter("@Second_name", userSecondName));
                 command.Parameters.Add(new SqliteParameter("@Id", userId));
                 command.Parameters.Add(new SqliteParameter("@Date_insert", DateTime.Now.ToString("g")));
                 command.Parameters.Add(new SqliteParameter("@Active", 1));
-               command.ExecuteNonQuery();
-               
+                command.ExecuteNonQuery();
+
 
             }
         }

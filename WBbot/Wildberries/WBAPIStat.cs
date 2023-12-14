@@ -1,10 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Telegram.Bot;
+﻿using Microsoft.AspNetCore.WebUtilities;
+using Newtonsoft.Json;
 
 namespace WBbot.Wildberries;
 
@@ -125,38 +120,71 @@ internal class WBAPIStat
         }
     }
 
-        public async Task<string?> GetStoks()
-        {
+
+    // Получение информации об остатках на складе
+    public async Task<string?> GetStocks()
+    {
+
+        var tokenMarket = "eyJhbGciOiJFUzI1NiIsImtpZCI6IjIwMjMxMDI1djEiLCJ0eXAiOiJKV1QifQ.eyJlbnQiOjEsImV4cCI6MTcxNzU2NDI5NCwiaWQiOiIyZTkyOTEwOC0xNzhkLTQ2NjEtOGE3My00YzE0YjY2ODQ5MzEiLCJpaWQiOjU3Njc4NTE5LCJvaWQiOjE0MjIzMzMsInMiOjEwNzM3NDE4NDAsInNpZCI6ImM0MjM1MmRjLTVkYjktNGVjMi1hZDViLWQ0ZTc4YTgzZjZiMiIsInVpZCI6NTc2Nzg1MTl9.ZZLdfKgj2NdSJyp4biirqYkVpTjsia9_fdQdWI4x74_BnTmGgt-0R8b0X05Cxvf76dBPwwoXQqHQgjm2URiSbw";
+
+        // Устанавливаем URL для отправки HTTP-запроса
         var url = "https://statistics-api.wildberries.ru/api/v1/supplier/stocks";
-            
-            using (var client = new HttpClient())
+
+        // Используем using для автоматического освобождения ресурсов после использования HttpClient
+        using (var client = new HttpClient())
+        {
+            // Добавляем заголовок Authorization с токеном
+            client.DefaultRequestHeaders.Add("Authorization", Token);
+
+            // Создаем словарь с параметром "dateFrom", устанавливаем на текущую дату минус год
+            var query = new Dictionary<string, string>()
             {
-                client.DefaultRequestHeaders.Add("Authorization", Token);
+                ["dateFrom"] = DateTime.Now.AddYears(-1).ToString("O")
+            };
 
-                var query = new Dictionary<string, string>()
-                {
-                    ["dateFrom"] = DateTime.UtcNow.ToString("O")
-                };
-                url = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(url, query);
-                var response = client.GetStringAsync(url).Result;
+            // Обновляем URL, добавляя параметры из словаря
+            url = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(url, query);
 
+            try
+            {
+                // Отправляем GET-запрос к серверу и получаем ответ в виде строки
+                var response = await client.GetStringAsync(url);
 
+                // Инициализируем пустую строку для сообщения и переменную для подсчета элементов
                 string message = "";
-                int i = 1;
+                int count = 1;
+
+                // Десериализуем полученные данные в список объектов класса Stock
                 var stocks = JsonConvert.DeserializeObject<List<Stock>>(response);
-                if (stocks.Count == 0) { return message = "На складе пусто"; }
-            message += $"Отчетное время: {DateTime.Now.ToString("g")}\n";
-                foreach (var item in stocks)
+
+                // Проверяем, если список пуст, возвращаем "На складе пусто"
+                if (stocks.Count == 0) { return "На складе пусто"; }
+
+                // Добавляем в сообщение информацию об остатке на складе
+                message += "Остаток на складе:\n";
+
+                // Перебираем элементы списка stocks
+                foreach (var stock in stocks)
                 {
-                    message += $"{i++}) {keyValuePairs[item.barcode]} в количестве {item.quantity} ({item.quantityFull}) по цене {item.Price}) \n";
+                    // Проверяем, если количество равно нулю, переходим к следующей итерации цикла
+                    if (stock.quantity == 0) { continue; }
 
+                    // Добавляем в сообщение информацию о каждом элементе в формате: Номер) Название -- Количество шт -- Название склада
+                    message += $"{count++}) {keyValuePairs[stock.barcode]} -- {stock.quantity} шт -- ({stock.warehouseName})\n";
                 }
+
+                // Возвращаем сформированное сообщение
                 return message;
-                //await Console.Out.WriteLineAsync(orders[0].barcode);
-
-
+            }
+            catch (Exception ex)
+            {
+                // В случае возникновения ошибки, возвращаем null
+                Console.WriteLine($"Ошибка при получении остатков на складе: {ex.Message}");
+                return null;
             }
         }
+    }
+
 
     public async Task<string?> GetIncomes()
     {
@@ -170,57 +198,87 @@ internal class WBAPIStat
             {
                 ["dateFrom"] = DateTime.Now.AddDays(-7).ToString("O")
             };
-            url = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(url, query);
-            var response = client.GetStringAsync(url).Result;
 
+            url = QueryHelpers.AddQueryString(url, query);
 
-            string message = "";
-            int i = 1;
-            var Incomes = JsonConvert.DeserializeObject<List<Income>>(response);
-            if (Incomes.Count == 0) { return message = "пусто"; }
-            message += $"Отчетное время: {DateTime.Now.AddHours(-3).ToString("g")}\n";
-            foreach (var item in Incomes)
+            try
             {
-                message += $"{i++}) {keyValuePairs[item.barcode]} в количестве {item.quantity} Склад: {item.warehouseName}) \n";
+                var response = await client.GetStringAsync(url);
 
+                var message = BuildIncomeMessage(response);
+                return message;
             }
-            return message;
-            //await Console.Out.WriteLineAsync(orders[0].barcode);
-
-
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                // В этом месте можно обработать исключение или вернуть сообщение об ошибке
+                return null;
+            }
         }
+    }
+
+    private string BuildIncomeMessage(string response)
+    {
+        string message = "";
+        int i = 1;
+        var Incomes = JsonConvert.DeserializeObject<List<Income>>(response);
+
+        if (Incomes.Count == 0)
+        {
+            return "пусто";
+        }
+
+        message += $"Отчетное время: {DateTime.Now.AddHours(-3).ToString("g")}\n";
+
+        foreach (var item in Incomes)
+        {
+            if (keyValuePairs.TryGetValue(item.barcode, out var itemName))
+            {
+                message += $"{i++}) {itemName} в количестве {item.quantity} Склад: {item.warehouseName}) \n";
+            }
+            else
+            {
+                // Обработка, если ключ не найден в словаре
+                message += $"{i++}) Unknown в количестве {item.quantity} Склад: {item.warehouseName}) \n";
+            }
+        }
+
+        return message;
     }
 
     public async Task<string?> GetAllOrders(DateTime dateTime)
     {
         var url = "https://statistics-api.wildberries.ru/api/v1/supplier/orders";
 
+        // Create HttpClient with using statement to ensure proper disposal
         using (var client = new HttpClient())
         {
             client.DefaultRequestHeaders.Add("Authorization", Token);
 
+            // Append query string parameter for dateFrom
             var query = new Dictionary<string, string>()
             {
                 ["dateFrom"] = dateTime.ToString("O")
             };
             url = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(url, query);
-            var response = client.GetStringAsync(url).Result;
 
+            // Use await instead of Result to correctly handle asynchronous operations
+            var response = await client.GetStringAsync(url);
 
             string message = "";
             int i = 1;
             var orders = JsonConvert.DeserializeObject<List<StatOrder>>(response);
+
             if (orders.Count == 0) { return message = "пусто"; }
+
             message += $"Отчетное время: {dateTime.ToString("g")}\n";
+
             foreach (var item in orders)
             {
-                message += $"{i++}) {item.date} -{keyValuePairs[item.barcode]} -- {item.priceWithDisc} руб, откуда: {item.warehouseName} куда {item.regionName}  \n";
-
+                message += $"{i++}) {item.date} -{keyValuePairs[item.barcode]} -- {item.priceWithDisc} руб, откуда: {item.warehouseName} куда {item.regionName}\n";
             }
+
             return message;
-            //await Console.Out.WriteLineAsync(orders[0].barcode);
-
-
         }
     }
 

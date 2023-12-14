@@ -1,23 +1,48 @@
-﻿
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Telegram.Bot;
 using WBbot;
 using WBbot.Wildberries;
 
-Configuration configuration = new Configuration();
-APIWild wild = new APIWild(configuration.WildberriesToken, configuration.WildberriesTokenStat);//, botWorker.botClient);
-WBAPIStat stat = new WBAPIStat(configuration.WildberriesTokenStat);
-string connectionString = "Data Source =" + configuration.ConnectionStrings;
-using CancellationTokenSource cts = new();
-BotWorker botWorker = new BotWorker(configuration.TelegramToken, cts, connectionString);
-botWorker.APIWild = wild;
-botWorker.APIStat = stat;
-var me = await botWorker.botClient.GetMeAsync();
-Console.WriteLine($"Start listening for @{me.Username}");
+class Program
+{
+    static async Task Main()
+    {
+        // Создаем объект для работы с конфигурацией
+        Configuration configuration = new Configuration();
 
+        // Инициализируем экземпляры классов для работы с Wildberries API и Stat
+        APIWild wild = new APIWild(configuration.WildberriesToken, configuration.WildberriesTokenStat);
+        WBAPIStat stat = new WBAPIStat(configuration.WildberriesTokenStat);
 
+        // Инициализируем строку для подключения к базе данных
+        string connectionString = "Data Source =" + configuration.ConnectionStrings;
 
-await wild.SendMessage();
-//await wild.SendStat();
+        // Инициализируем CancellationTokenSource для отмены задачи
+        using CancellationTokenSource cts = new();
 
-Console.ReadLine();
-cts.Cancel();
+        // Инициализируем объект BotWorker для работы с Telegram Bot API
+        BotWorker botWorker = new BotWorker(configuration.TelegramToken, cts, connectionString);
+
+        // Передаем экземпляры классов APIWild и WBAPIStat внутрь объекта botWorker
+        botWorker.APIWild = wild;
+        botWorker.APIStat = stat;
+
+        // Получаем информацию о боте с помощью Telegram Bot API
+        var me = await botWorker.botClient.GetMeAsync();
+        Console.WriteLine($"Start listening for @{me.Username}");
+
+        // Отправляем сообщение через Wildberries API
+        await wild.SendMessage();
+
+        // Отправляем статистику через Wildberries API
+        // await wild.SendStat();
+
+        // Ждем ввода с клавиатуры для завершения программы
+        Console.ReadLine();
+
+        // Отменяем задачу с помощью CancellationTokenSource
+        cts.Cancel();
+    }
+}
