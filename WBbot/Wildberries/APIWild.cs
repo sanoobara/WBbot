@@ -77,22 +77,6 @@ namespace WBbot.Wildberries
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public class Order
     {
         public object address { get; set; }

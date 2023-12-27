@@ -82,10 +82,11 @@ namespace WBbot
                     {
                         var message = update.CallbackQuery;
                         var user = message.From;
-                        if (message.Data == "Месяц")
+                        if (message.Data == "Sales")
                         {
-                            var s = await APIStat.SendReport(DateTime.UtcNow.AddDays(-30), DateTime.UtcNow);
-                           // await botClient.SendTextMessageAsync("370802502", s);
+                            var s = await APIStat.GetAllSales(DateTime.Now.AddDays(-7));
+                            await botClient.SendTextMessageAsync(user.Id, s);
+                            
                             break;
                         }
                         if (message.Data == "остатки")
@@ -98,6 +99,13 @@ namespace WBbot
                         if (message.Data == "incomes")
                         {
                             var s = await APIStat.GetIncomes();
+                            await botClient.SendTextMessageAsync(user.Id, s);
+                            //await botClient.SendTextMessageAsync("388867563", s);
+                            break;
+                        }
+                        if (message.Data == "Anal")
+                        {
+                            var s = await APIStat.AnalyticReport();
                             await botClient.SendTextMessageAsync(user.Id, s);
                             //await botClient.SendTextMessageAsync("388867563", s);
                             break;
@@ -138,13 +146,14 @@ namespace WBbot
             {
                 //InlineKeyboardButton.WithCallbackData(text: dateTime.AddDays(-1).ToString("d"), callbackData: dateTime.AddDays(-1).ToString("d")),
                 //InlineKeyboardButton.WithCallbackData(text: dateTime.AddDays(-3).ToString("d"), callbackData: dateTime.AddDays(-3).ToString("d")),
-                InlineKeyboardButton.WithCallbackData(text: "Отчет", callbackData: "Месяц"),
+                InlineKeyboardButton.WithCallbackData(text: "Sales", callbackData: "Sales"),
                 InlineKeyboardButton.WithCallbackData(text: "Остатки", callbackData: "остатки"),
 
             },
             new []
             {
                 InlineKeyboardButton.WithCallbackData(text: "stat_order", callbackData: "get_stat_order"),
+                InlineKeyboardButton.WithCallbackData(text: "anal", callbackData: "Anal"),
 
             },
             });
