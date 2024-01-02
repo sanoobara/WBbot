@@ -34,7 +34,7 @@ class Program
         Console.WriteLine($"Start listening for @{me.Username}");
 
         // Отправляем сообщение через Wildberries API
-        await wild.SendMessage();
+        //await wild.SendMessage();
 
         // Отправляем статистику через Wildberries API
         // await wild.SendStat();

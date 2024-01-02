@@ -117,6 +117,13 @@ namespace WBbot
                             //await botClient.SendTextMessageAsync("388867563", s);
                             break;
                         }
+                        if (message.Data == "isCancel")
+                        {
+                            var s = await APIStat.GetAllOrdersCancel(DateTime.Now.AddDays(-30));
+                            await botClient.SendTextMessageAsync(user.Id, s);
+                            //await botClient.SendTextMessageAsync("388867563", s);
+                            break;
+                        }
 
                         else
                         {
@@ -154,7 +161,7 @@ namespace WBbot
             {
                 InlineKeyboardButton.WithCallbackData(text: "stat_order", callbackData: "get_stat_order"),
                 InlineKeyboardButton.WithCallbackData(text: "anal", callbackData: "Anal"),
-
+                InlineKeyboardButton.WithCallbackData(text: "isCancel", callbackData: "isCancel"),
             },
             });
 

@@ -274,7 +274,50 @@ internal class WBAPIStat
 
             foreach (var item in orders)
             {
-                message += $"{i++}) {item.date} -{keyValuePairs[item.barcode]} -- {item.priceWithDisc} руб, откуда: {item.warehouseName} куда {item.regionName}\n";
+                if (item.isCancel == true) { continue; }
+                else
+                {
+                    message += $"{i++}) {item.date} -{keyValuePairs[item.barcode]} -- {item.priceWithDisc} руб, откуда: {item.warehouseName} куда {item.regionName}\n";
+                }
+            }
+
+            return message;
+        }
+    }
+    public async Task<string?> GetAllOrdersCancel(DateTime dateTime)
+    {
+        var url = "https://statistics-api.wildberries.ru/api/v1/supplier/orders";
+
+        // Create HttpClient with using statement to ensure proper disposal
+        using (var client = new HttpClient())
+        {
+            client.DefaultRequestHeaders.Add("Authorization", Token);
+
+            // Append query string parameter for dateFrom
+            var query = new Dictionary<string, string>()
+            {
+                ["dateFrom"] = dateTime.ToString("O")
+            };
+            url = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(url, query);
+
+            // Use await instead of Result to correctly handle asynchronous operations
+            var response = await client.GetStringAsync(url);
+
+            string message = "";
+            int i = 1;
+            var orders = JsonConvert.DeserializeObject<List<StatOrder>>(response);
+
+            if (orders.Count == 0) { return message = "пусто"; }
+
+            message += $"Отчетное время: {dateTime.ToString("g")}\n";
+
+            foreach (var item in orders)
+            {
+                if (item.isCancel == true) { message += $"{i++}) {item.date} -{keyValuePairs[item.barcode]} -- {item.priceWithDisc} руб, откуда: {item.warehouseName} куда {item.regionName}\n"; }
+                else
+                {
+                    continue;
+                }
             }
 
             return message;
@@ -323,10 +366,12 @@ internal class WBAPIStat
         using (var client = new HttpClient())
         {
             string token = "eyJhbGciOiJFUzI1NiIsImtpZCI6IjIwMjMxMjI1djEiLCJ0eXAiOiJKV1QifQ.eyJlbnQiOjEsImV4cCI6MTcxOTQ3MTY3OCwiaWQiOiI0ZjhkMmVkYi00NGNiLTRhYzAtODIwMi1iMzliMzI0MzBmNjEiLCJpaWQiOjU3Njc4NTE5LCJvaWQiOjE0MjIzMzMsInMiOjQsInNpZCI6ImM0MjM1MmRjLTVkYjktNGVjMi1hZDViLWQ0ZTc4YTgzZjZiMiIsInQiOmZhbHNlLCJ1aWQiOjU3Njc4NTE5fQ.03u83eEG9QpGgVuwYxR5dWOuezkqcMsU7P7xqwUXeMSomUbt7V8T0b95QcLLU0AKzhyJ1kkkvxBI41ndQMhiyw";
-           // HttpContent content = new StringContent("{\r\n  \"period\": {\r\n    \"begin\": \"2023-12-01 20:05:32\",\r\n    \"end\": \"2023-12-26 20:05:32\"\r\n  },\r\n  \"page\": 1\r\n}");
+            // HttpContent content = new StringContent("{\r\n  \"period\": {\r\n    \"begin\": \"2023-12-01 20:05:32\",\r\n    \"end\": \"2023-12-26 20:05:32\"\r\n  },\r\n  \"page\": 1\r\n}");
             // устанавливаем заголовок 
-
-            Period period = new Period() { begin = "2023-12-20 20:05:32", end = "2023-12-26 20:05:32" };
+            string desiredTimeBegin = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day-1).ToString("yyyy-MM-dd HH:mm:ss");
+            string  desiredTimeEnd = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day - 1, 23, 59, 59).ToString("yyyy-MM-dd HH:mm:ss");
+            
+            Period period = new Period() { begin = desiredTimeBegin, end = desiredTimeEnd };
             Request request = new Request() { page = 1 , period = period };
 
             JsonContent content = JsonContent.Create(request);
@@ -335,7 +380,7 @@ internal class WBAPIStat
             using var response = await client.PostAsync("https://suppliers-api.wildberries.ru/content/v1/analytics/nm-report/detail", content);
             string responseText = await response.Content.ReadAsStringAsync(); 
             var anal = JsonConvert.DeserializeObject<AnalyticSturust>(responseText);
-            string message = "";
+            string message = $"С {desiredTimeBegin} по {desiredTimeEnd}\n";
             int i = 1;
             
 
@@ -343,7 +388,7 @@ internal class WBAPIStat
 
             foreach (var item in anal.data.cards)
             {
-                message += $"{i++}) {item.statistics.selectedPeriod.addToCartCount} -- Корзина  -- {item.statistics.selectedPeriod.openCardCount} просмотрели\n";
+                message += $"{i++})  {item.statistics.selectedPeriod.addToCartCount} -- Корзина  -- {item.statistics.selectedPeriod.openCardCount} просмотрели\n";
             }
 
             return message;
