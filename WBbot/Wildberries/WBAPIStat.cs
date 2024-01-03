@@ -162,6 +162,9 @@ internal class WBAPIStat
                 // Добавляем в сообщение информацию об остатке на складе
                 message += "Остаток на складе:\n";
 
+                //Общий счетчик остатков на складе
+                int all = 0;
+
                 // Перебираем элементы списка stocks
                 foreach (var stock in stocks)
                 {
@@ -170,8 +173,9 @@ internal class WBAPIStat
 
                     // Добавляем в сообщение информацию о каждом элементе в формате: Номер) Название -- Количество шт -- Название склада
                     message += $"{count++}) {keyValuePairs[stock.barcode]} -- {stock.quantity} шт -- ({stock.warehouseName})\n";
+                    all += stock.quantity;
                 }
-
+                message += $"Ежедневный платеж за складское храниение {all} рублей";
                 // Возвращаем сформированное сообщение
                 return message;
             }
@@ -179,7 +183,8 @@ internal class WBAPIStat
             {
                 // В случае возникновения ошибки, возвращаем null
                 Console.WriteLine($"Ошибка при получении остатков на складе: {ex.Message}");
-                return null;
+                string message = $"Ошибка при получении остатков на складе: {ex.Message}";
+                return message;
             }
         }
     }
@@ -323,7 +328,6 @@ internal class WBAPIStat
             return message;
         }
     }
-
 
     public async Task<string?> GetAllSales(DateTime dateTime)
     {

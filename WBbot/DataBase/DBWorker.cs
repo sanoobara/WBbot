@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 
-namespace WBbot
+namespace WBbot.DataBase
 {
     internal class DBWorker
     {
@@ -15,7 +15,7 @@ namespace WBbot
 
         public async Task AddUser(string userName, long userId, string userFirstName, string userSecondName)
         {
-            await using (var connection = new SqliteConnection(this.connectionString))
+            await using (var connection = new SqliteConnection(connectionString))
             {
 
                 connection.Open();
@@ -38,7 +38,7 @@ namespace WBbot
 
         public async Task AddUser(string userName, long userId, string userFirstName)
         {
-            await using (var connection = new SqliteConnection(this.connectionString))
+            await using (var connection = new SqliteConnection(connectionString))
             {
 
                 connection.Open();
