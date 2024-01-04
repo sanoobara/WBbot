@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -12,16 +13,21 @@ internal class WBAPIStat
     string Token;
     const string Url = "https://suppliers-api.wildberries.ru/api/v3/orders/new";
     const string Urlsupplier = "https://statistics-api.wildberries.ru/api/v1/supplier/orders";
-    Dictionary<string, string> keyValuePairs;
+    Dictionary<string, string> keyValuePairsBarcode;
+    Dictionary<string, string> keyValuePairsArticle;
 
     public WBAPIStat(string token)
     {
         Token = token;
 
         //this.botClient = botClient;
-        using (StreamReader sr = new StreamReader("Barcode.json"))
+        using (StreamReader sr = new StreamReader("Wildberries\\Barcode.json"))
         {
-            keyValuePairs = JsonConvert.DeserializeObject<Dictionary<string, string>>(sr.ReadToEnd());
+            keyValuePairsBarcode = JsonConvert.DeserializeObject<Dictionary<string, string>>(sr.ReadToEnd());
+        }
+        using (StreamReader sr = new StreamReader("Wildberries\\Article.json"))
+        {
+            keyValuePairsArticle = JsonConvert.DeserializeObject<Dictionary<string, string>>(sr.ReadToEnd());
         }
 
     }
@@ -47,7 +53,7 @@ internal class WBAPIStat
             if (orders.Count == 0) { return message; }
             foreach (var item in orders)
             {
-                message += $"{i++}) {item.date.AddHours(3).ToString("g")} {keyValuePairs[item.barcode]} price: {item.priceWithDisc}->{item.finishedPrice} \n";
+                message += $"{i++}) {item.date.AddHours(3).ToString("g")} {keyValuePairsBarcode[item.barcode]} price: {item.priceWithDisc}->{item.finishedPrice} \n";
 
             }
             return message;
@@ -172,7 +178,7 @@ internal class WBAPIStat
                     if (stock.quantity == 0) { continue; }
 
                     // Добавляем в сообщение информацию о каждом элементе в формате: Номер) Название -- Количество шт -- Название склада
-                    message += $"{count++}) {keyValuePairs[stock.barcode]} -- {stock.quantity} шт -- ({stock.warehouseName})\n";
+                    message += $"{count++}) {keyValuePairsBarcode[stock.barcode]} -- {stock.quantity} шт -- ({stock.warehouseName})\n";
                     all += stock.quantity;
                 }
                 message += $"Ежедневный платеж за складское храниение {all} рублей";
@@ -236,7 +242,7 @@ internal class WBAPIStat
 
         foreach (var item in Incomes)
         {
-            if (keyValuePairs.TryGetValue(item.barcode, out var itemName))
+            if (keyValuePairsBarcode.TryGetValue(item.barcode, out var itemName))
             {
                 message += $"{i++}) {itemName} в количестве {item.quantity} Склад: {item.warehouseName}) \n";
             }
@@ -253,79 +259,92 @@ internal class WBAPIStat
     public async Task<string?> GetAllOrders(DateTime dateTime)
     {
         var url = "https://statistics-api.wildberries.ru/api/v1/supplier/orders";
-
-        // Create HttpClient with using statement to ensure proper disposal
-        using (var client = new HttpClient())
+        try
         {
-            client.DefaultRequestHeaders.Add("Authorization", Token);
-
-            // Append query string parameter for dateFrom
-            var query = new Dictionary<string, string>()
+            // Create HttpClient with using statement to ensure proper disposal
+            using (var client = new HttpClient())
             {
-                ["dateFrom"] = dateTime.ToString("O")
-            };
-            url = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(url, query);
+                client.DefaultRequestHeaders.Add("Authorization", Token);
 
-            // Use await instead of Result to correctly handle asynchronous operations
-            var response = await client.GetStringAsync(url);
-
-            string message = "";
-            int i = 1;
-            var orders = JsonConvert.DeserializeObject<List<StatOrder>>(response);
-
-            if (orders.Count == 0) { return message = "пусто"; }
-
-            message += $"Отчетное время: {dateTime.ToString("g")}\n";
-
-            foreach (var item in orders)
-            {
-                if (item.isCancel == true) { continue; }
-                else
+                // Append query string parameter for dateFrom
+                var query = new Dictionary<string, string>()
                 {
-                    message += $"{i++}) {item.date} -{keyValuePairs[item.barcode]} -- {item.priceWithDisc} руб, откуда: {item.warehouseName} куда {item.regionName}\n";
-                }
-            }
+                    ["dateFrom"] = dateTime.ToString("O")
+                };
+                url = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(url, query);
 
-            return message;
+                // Use await instead of Result to correctly handle asynchronous operations
+                var response = await client.GetStringAsync(url);
+
+                string message = "";
+                int i = 1;
+                var orders = JsonConvert.DeserializeObject<List<StatOrder>>(response);
+
+                if (orders.Count == 0) { return message = "пусто"; }
+
+                message += $"Отчетное время: {dateTime.ToString("g")}\n";
+
+                foreach (var item in orders)
+                {
+                    if (item.isCancel == true) { continue; }
+                    else
+                    {
+                        message += $"{i++}) {item.date} -{keyValuePairsBarcode[item.barcode]} -- {item.priceWithDisc} руб, откуда: {item.warehouseName} куда {item.regionName}\n";
+                    }
+                }
+
+                return message;
+            }
+        }
+        catch (Exception exception)
+        {           
+            Console.WriteLine(exception.Message);
+            return exception.Message;
         }
     }
     public async Task<string?> GetAllOrdersCancel(DateTime dateTime)
     {
         var url = "https://statistics-api.wildberries.ru/api/v1/supplier/orders";
-
-        // Create HttpClient with using statement to ensure proper disposal
-        using (var client = new HttpClient())
-        {
-            client.DefaultRequestHeaders.Add("Authorization", Token);
-
-            // Append query string parameter for dateFrom
-            var query = new Dictionary<string, string>()
+        try {
+            // Create HttpClient with using statement to ensure proper disposal
+            using (var client = new HttpClient())
             {
-                ["dateFrom"] = dateTime.ToString("O")
-            };
-            url = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(url, query);
+                client.DefaultRequestHeaders.Add("Authorization", Token);
 
-            // Use await instead of Result to correctly handle asynchronous operations
-            var response = await client.GetStringAsync(url);
-
-            string message = "";
-            int i = 1;
-            var orders = JsonConvert.DeserializeObject<List<StatOrder>>(response);
-
-            if (orders.Count == 0) { return message = "пусто"; }
-
-            message += $"Отчетное время: {dateTime.ToString("g")}\n";
-
-            foreach (var item in orders)
-            {
-                if (item.isCancel == true) { message += $"{i++}) {item.date} -{keyValuePairs[item.barcode]} -- {item.priceWithDisc} руб, откуда: {item.warehouseName} куда {item.regionName}\n"; }
-                else
+                // Append query string parameter for dateFrom
+                var query = new Dictionary<string, string>()
                 {
-                    continue;
-                }
-            }
+                    ["dateFrom"] = dateTime.ToString("O")
+                };
+                url = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(url, query);
 
-            return message;
+                // Use await instead of Result to correctly handle asynchronous operations
+                var response = await client.GetStringAsync(url);
+
+                string message = "";
+                int i = 1;
+                var orders = JsonConvert.DeserializeObject<List<StatOrder>>(response);
+
+                if (orders.Count == 0) { return message = "пусто"; }
+
+                message += $"Отчетное время: {dateTime.ToString("g")}\n";
+
+                foreach (var item in orders)
+                {
+                    if (item.isCancel == true) { message += $"{i++}) {item.date} -{keyValuePairsBarcode[item.barcode]} -- {item.priceWithDisc} руб, откуда: {item.warehouseName} куда {item.regionName}\n"; }
+                    else
+                    {
+                        continue;
+                    }
+                }
+
+                return message;
+            }
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine(exception.Message);
+            return exception.Message;
         }
     }
 
@@ -358,7 +377,7 @@ internal class WBAPIStat
 
             foreach (var item in sales)
             {
-                message += $"{i++}) {item.date} -{keyValuePairs[item.barcode]} -- {item.forPay} руб, откуда: {item.regionName}\n";
+                message += $"{i++}) {item.date} -{keyValuePairsBarcode[item.barcode]} -- {item.forPay} руб, откуда: {item.regionName}\n";
             }
 
             return message;
@@ -386,13 +405,16 @@ internal class WBAPIStat
             var anal = JsonConvert.DeserializeObject<AnalyticSturust>(responseText);
             string message = $"С {desiredTimeBegin} по {desiredTimeEnd}\n";
             int i = 1;
-            
 
-           
+
+
 
             foreach (var item in anal.data.cards)
             {
-                message += $"{i++})  {item.statistics.selectedPeriod.addToCartCount} -- Корзина  -- {item.statistics.selectedPeriod.openCardCount} просмотрели\n";
+                if (keyValuePairsArticle.ContainsKey(item.nmID.ToString()))
+                {
+                    message += $"{i++}) {keyValuePairsArticle[item.nmID.ToString()]}  {item.statistics.selectedPeriod.addToCartCount} -- card  -- {item.statistics.selectedPeriod.openCardCount} look\n";
+                }
             }
 
             return message;

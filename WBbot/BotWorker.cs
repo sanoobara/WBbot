@@ -25,8 +25,6 @@ namespace WBbot
             this.cts = cts;
             dBWorker = new DBWorker(connectionString);
 
-
-
             // StartReceiving does not block the caller thread. Receiving is done on the ThreadPool.
             ReceiverOptions receiverOptions = new()
             {
@@ -42,25 +40,20 @@ namespace WBbot
             );
         }
 
-
-        async Task Starting(User user)
-        {
-            if (user.LastName is null)
-            {
-                await dBWorker.AddUser(user.Username, user.Id, user.FirstName);
-            }
-            else
-            {
-                await dBWorker.AddUser(user.Username, user.Id, user.FirstName, user.LastName);
-            }
-
-        }
-
+        //async Task Starting(User user)
+        //{
+        //    if (user.LastName is null)
+        //    {
+        //        await dBWorker.AddUser(user.Username, user.Id, user.FirstName);
+        //    }
+        //    else
+        //    {
+        //        await dBWorker.AddUser(user.Username, user.Id, user.FirstName, user.LastName);
+        //    }
+        //}
 
         async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
-        {
-
-           
+        {           
             switch (update.Type)
             {
                 case UpdateType.Message:
@@ -70,13 +63,9 @@ namespace WBbot
 
                         if (message.Text == "/start")
                         {
-                            await Starting(user);
-                            GetTestKeyboard(message);
-
+                            //await Starting(user);
+                            await GetTestKeyboard(message);
                         }
-
-
-
                         break;
                     }
                 case UpdateType.CallbackQuery:
@@ -85,61 +74,57 @@ namespace WBbot
                         var user = message.From;
                         if (message.Data == "Sales")
                         {
+                            await dBWorker.AddUser(user.Username, user.Id, message.Data);
                             var s = await APIStat.GetAllSales(DateTime.Now.AddDays(-7));
                             await botClient.SendTextMessageAsync(user.Id, s);
-                            
                             break;
                         }
-                        if (message.Data == "остатки")
+                        if (message.Data == "Остатки")
                         {
+                            await dBWorker.AddUser(user.Username, user.Id, message.Data);
                             var s = await APIStat.GetStocks();
                             await botClient.SendTextMessageAsync(user.Id, s);
-                            //await botClient.SendTextMessageAsync("388867563", s);
                             break;
                         }
                         if (message.Data == "incomes")
                         {
+                            await dBWorker.AddUser(user.Username, user.Id, message.Data);
                             var s = await APIStat.GetIncomes();
                             await botClient.SendTextMessageAsync(user.Id, s);
-                            //await botClient.SendTextMessageAsync("388867563", s);
                             break;
                         }
                         if (message.Data == "Anal")
                         {
+                            await dBWorker.AddUser(user.Username, user.Id, message.Data);
                             var s = await APIStat.AnalyticReport();
                             await botClient.SendTextMessageAsync(user.Id, s);
-                            //await botClient.SendTextMessageAsync("388867563", s);
                             break;
                         }
-                        if (message.Data == "get_stat_order")
+                        if (message.Data == "stat_order")
                         {
+                            await dBWorker.AddUser(user.Username, user.Id, message.Data);
                             var s = await APIStat.GetAllOrders(DateTime.Now.AddDays(-7));
                             await botClient.SendTextMessageAsync(user.Id, s);
-                            //await botClient.SendTextMessageAsync("388867563", s);
                             break;
                         }
                         if (message.Data == "isCancel")
                         {
+                            await dBWorker.AddUser(user.Username, user.Id, message.Data);
                             var s = await APIStat.GetAllOrdersCancel(DateTime.Now.AddDays(-30));
                             await botClient.SendTextMessageAsync(user.Id, s);
-                            //await botClient.SendTextMessageAsync("388867563", s);
                             break;
                         }
 
                         else
                         {
-
                             DateTime t;
                             DateTime.TryParse(message.Data, out t);
                             var s = await APIStat.SendStat(t);
-
                             await botClient.SendTextMessageAsync("370802502", s);
                             await botClient.SendTextMessageAsync("388867563", s);
-
                             break;
                         }
                     }
-
 
             }
 
@@ -152,15 +137,14 @@ namespace WBbot
             // first row
             new []
             {
-                //InlineKeyboardButton.WithCallbackData(text: dateTime.AddDays(-1).ToString("d"), callbackData: dateTime.AddDays(-1).ToString("d")),
-                //InlineKeyboardButton.WithCallbackData(text: dateTime.AddDays(-3).ToString("d"), callbackData: dateTime.AddDays(-3).ToString("d")),
+                
                 InlineKeyboardButton.WithCallbackData(text: "Sales", callbackData: "Sales"),
-                InlineKeyboardButton.WithCallbackData(text: "Остатки", callbackData: "остатки"),
+                InlineKeyboardButton.WithCallbackData(text: "Остатки", callbackData: "Остатки"),
 
             },
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "stat_order", callbackData: "get_stat_order"),
+                InlineKeyboardButton.WithCallbackData(text: "Стат по заказам", callbackData: "stat_order"),
                 InlineKeyboardButton.WithCallbackData(text: "anal", callbackData: "Anal"),
                 InlineKeyboardButton.WithCallbackData(text: "isCancel", callbackData: "isCancel"),
             },
@@ -173,13 +157,7 @@ namespace WBbot
                     cancellationToken: this.cts.Token);
             }
 
-
-
         }
-
-
-
-
 
 
         Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
