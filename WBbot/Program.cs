@@ -1,9 +1,7 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using WBbot;
 using WBbot.Wildberries;
+using WBbot.Wildberries.Marketplace;
 
 class Program
 {
@@ -13,7 +11,7 @@ class Program
         Configuration configuration = new Configuration();
 
         // Инициализируем экземпляры классов для работы с Wildberries API и Stat
-        APIWild wild = new APIWild(configuration.WildberriesToken, configuration.WildberriesTokenStat);
+        MarketPlaceAPI wild = new MarketPlaceAPI(configuration.WildberriesToken, configuration.WildberriesTokenStat);
         WBAPIStat stat = new WBAPIStat(configuration.WildberriesTokenStat);
 
         // Инициализируем строку для подключения к базе данных

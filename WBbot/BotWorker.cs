@@ -5,6 +5,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using WBbot.Wildberries;
+using WBbot.Wildberries.Marketplace;
 
 namespace WBbot
 {
@@ -14,7 +15,7 @@ namespace WBbot
         public TelegramBotClient botClient;
         DBWorker dBWorker;
         CancellationTokenSource cts;
-        public APIWild APIWild { get; set; }
+        public MarketPlaceAPI APIWild { get; set; }
         public WBAPIStat APIStat { get; set; }
 
         public BotWorker(string Token, CancellationTokenSource cts, string connectionString)
@@ -59,7 +60,7 @@ namespace WBbot
         async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
 
-           
+
             switch (update.Type)
             {
                 case UpdateType.Message:
@@ -86,7 +87,7 @@ namespace WBbot
                         {
                             var s = await APIStat.GetAllSales(DateTime.Now.AddDays(-7));
                             await botClient.SendTextMessageAsync(user.Id, s);
-                            
+
                             break;
                         }
                         if (message.Data == "остатки")

@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
-using System.Net.Http;
 using System.Net.Http.Json;
-using Telegram.Bot.Types;
 
 namespace WBbot.Wildberries;
 
@@ -210,7 +208,7 @@ internal class WBAPIStat
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
-                // В этом месте можно обработать исключение или вернуть сообщение об ошибке
+
                 return null;
             }
         }
@@ -313,7 +311,7 @@ internal class WBAPIStat
 
             foreach (var item in orders)
             {
-                if (item.isCancel == true) { message += $"{i++}) {item.date} -{keyValuePairs[item.barcode]} -- {item.priceWithDisc} руб, откуда: {item.warehouseName} куда {item.regionName}\n"; }
+                if (item.isCancel == true) { message += $"{i++}) {item.date} -{keyValuePairs[item.barcode]} -- {item.priceWithDisc} руб, куда {item.regionName}\n"; }
                 else
                 {
                     continue;
@@ -368,23 +366,23 @@ internal class WBAPIStat
             string token = "eyJhbGciOiJFUzI1NiIsImtpZCI6IjIwMjMxMjI1djEiLCJ0eXAiOiJKV1QifQ.eyJlbnQiOjEsImV4cCI6MTcxOTQ3MTY3OCwiaWQiOiI0ZjhkMmVkYi00NGNiLTRhYzAtODIwMi1iMzliMzI0MzBmNjEiLCJpaWQiOjU3Njc4NTE5LCJvaWQiOjE0MjIzMzMsInMiOjQsInNpZCI6ImM0MjM1MmRjLTVkYjktNGVjMi1hZDViLWQ0ZTc4YTgzZjZiMiIsInQiOmZhbHNlLCJ1aWQiOjU3Njc4NTE5fQ.03u83eEG9QpGgVuwYxR5dWOuezkqcMsU7P7xqwUXeMSomUbt7V8T0b95QcLLU0AKzhyJ1kkkvxBI41ndQMhiyw";
             // HttpContent content = new StringContent("{\r\n  \"period\": {\r\n    \"begin\": \"2023-12-01 20:05:32\",\r\n    \"end\": \"2023-12-26 20:05:32\"\r\n  },\r\n  \"page\": 1\r\n}");
             // устанавливаем заголовок 
-            string desiredTimeBegin = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day-1).ToString("yyyy-MM-dd HH:mm:ss");
-            string  desiredTimeEnd = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day - 1, 23, 59, 59).ToString("yyyy-MM-dd HH:mm:ss");
-            
+            string desiredTimeBegin = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day - 1).ToString("yyyy-MM-dd HH:mm:ss");
+            string desiredTimeEnd = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day - 1, 23, 59, 59).ToString("yyyy-MM-dd HH:mm:ss");
+
             Period period = new Period() { begin = desiredTimeBegin, end = desiredTimeEnd };
-            Request request = new Request() { page = 1 , period = period };
+            Request request = new Request() { page = 1, period = period };
 
             JsonContent content = JsonContent.Create(request);
             client.DefaultRequestHeaders.Add("Authorization", token);
 
             using var response = await client.PostAsync("https://suppliers-api.wildberries.ru/content/v1/analytics/nm-report/detail", content);
-            string responseText = await response.Content.ReadAsStringAsync(); 
+            string responseText = await response.Content.ReadAsStringAsync();
             var anal = JsonConvert.DeserializeObject<AnalyticSturust>(responseText);
             string message = $"С {desiredTimeBegin} по {desiredTimeEnd}\n";
             int i = 1;
-            
 
-           
+
+
 
             foreach (var item in anal.data.cards)
             {
@@ -396,7 +394,7 @@ internal class WBAPIStat
 
         }
 
-        
+
     }
 
 
