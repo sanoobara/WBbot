@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
-using System.Net.Http;
 using System.Net.Http.Json;
-using Telegram.Bot.Types;
 
 namespace WBbot.Wildberries;
 
@@ -31,7 +29,6 @@ internal class WBAPIStat
         }
 
     }
-
 
     public async Task<string?> SendStat(DateTime dateTime)
     {
@@ -62,7 +59,6 @@ internal class WBAPIStat
 
         }
     }
-
 
     public async Task<string?> SendReport(DateTime dateTimeFrom, DateTime dateTimeTO)
     {
@@ -125,7 +121,6 @@ internal class WBAPIStat
         }
     }
 
-
     // Получение информации об остатках на складе
     public async Task<string?> GetStocks()
     {
@@ -170,6 +165,7 @@ internal class WBAPIStat
 
                 //Общий счетчик остатков на складе
                 int all = 0;
+                int Cost = 0;
 
                 // Перебираем элементы списка stocks
                 foreach (var stock in stocks)
@@ -177,11 +173,16 @@ internal class WBAPIStat
                     // Проверяем, если количество равно нулю, переходим к следующей итерации цикла
                     if (stock.quantity == 0) { continue; }
 
+                    //Посчитаешь стоимость склада
+
+                    Cost += stock.quantity * stock.Price;
+
                     // Добавляем в сообщение информацию о каждом элементе в формате: Номер) Название -- Количество шт -- Название склада
                     message += $"{count++}) {keyValuePairsBarcode[stock.barcode]} -- {stock.quantity} шт -- ({stock.warehouseName})\n";
                     all += stock.quantity;
                 }
-                message += $"Ежедневный платеж за складское храниение {all*0.4} рублей";
+                message += $"Ежедневный платеж за складское храниение {all} рублей\n";
+                message += $"Стоимость склада {Cost}";
                 // Возвращаем сформированное сообщение
                 return message;
             }
@@ -194,7 +195,6 @@ internal class WBAPIStat
             }
         }
     }
-
 
     public async Task<string?> GetIncomes()
     {
@@ -221,7 +221,7 @@ internal class WBAPIStat
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
-                // В этом месте можно обработать исключение или вернуть сообщение об ошибке
+
                 return null;
             }
         }
@@ -302,6 +302,7 @@ internal class WBAPIStat
             return exception.Message;
         }
     }
+    
     public async Task<string?> GetAllOrdersCancel(DateTime dateTime)
     {
         var url = "https://statistics-api.wildberries.ru/api/v1/supplier/orders";
@@ -329,14 +330,14 @@ internal class WBAPIStat
 
                 message += $"Отчетное время: {dateTime.ToString("g")}\n";
 
-                foreach (var item in orders)
+            foreach (var item in orders)
+            {
+                if (item.isCancel == true) { message += $"{i++}) {item.date} ({item.lastChangeDate}) - {keyValuePairsBarcode[item.barcode]} -- {item.priceWithDisc} р. {item.regionName}\n"; }
+                else
                 {
-                    if (item.isCancel == true) { message += $"{i++}) {item.date} -{keyValuePairsBarcode[item.barcode]} -- {item.priceWithDisc} р {item.regionName}\n"; }
-                    else
-                    {
-                        continue;
-                    }
+                    continue;
                 }
+            }
 
                 return message;
             }
@@ -395,13 +396,13 @@ internal class WBAPIStat
             string  desiredTimeEnd = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day - 1, 23, 59, 59).ToString("yyyy-MM-dd HH:mm:ss");
             
             Period period = new Period() { begin = desiredTimeBegin, end = desiredTimeEnd };
-            Request request = new Request() { page = 1 , period = period };
+            Request request = new Request() { page = 1, period = period };
 
             JsonContent content = JsonContent.Create(request);
             client.DefaultRequestHeaders.Add("Authorization", token);
 
             using var response = await client.PostAsync("https://suppliers-api.wildberries.ru/content/v1/analytics/nm-report/detail", content);
-            string responseText = await response.Content.ReadAsStringAsync(); 
+            string responseText = await response.Content.ReadAsStringAsync();
             var anal = JsonConvert.DeserializeObject<AnalyticSturust>(responseText);
             string message = $"С {desiredTimeBegin} по {desiredTimeEnd}\n";
             int i = 1;
@@ -422,7 +423,7 @@ internal class WBAPIStat
 
         }
 
-        
+
     }
 
 

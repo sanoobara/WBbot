@@ -6,6 +6,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using WBbot.DataBase;
 using WBbot.Wildberries;
+using WBbot.Wildberries.Marketplace;
 
 namespace WBbot
 {
@@ -15,7 +16,7 @@ namespace WBbot
         public TelegramBotClient botClient;
         DBWorker dBWorker;
         CancellationTokenSource cts;
-        public APIWild APIWild { get; set; }
+        public MarketPlaceAPI APIWild { get; set; }
         public WBAPIStat APIStat { get; set; }
 
         public BotWorker(string Token, CancellationTokenSource cts, string connectionString)

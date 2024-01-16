@@ -39,4 +39,9 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Wildberries\Statistic\Orders\" />
+    <Folder Include="Wildberries\Statistic\Новая папка\" />
+  </ItemGroup>
+
 </Project>
