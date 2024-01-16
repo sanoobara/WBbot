@@ -5,11 +5,21 @@ using Telegram.Bot;
 using WBbot;
 using WBbot.Configuration;
 using WBbot.Wildberries;
+using Microsoft.Extensions.Logging;
+
 
 class Program
 {
+
     static async Task Main()
     {
+        //var builder = WebApplication.CreateBuilder();
+        //var app = builder.Build();
+        //using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
+
+        //ILogger logger = factory.CreateLogger("Program");
+        //logger.LogInformation("Hello World! Logging is {Description}.", "fun");
+
         // Создаем объект для работы с конфигурацией
         Configuration configuration = new Configuration();
 
@@ -35,7 +45,7 @@ class Program
         Console.WriteLine($"Start listening for @{me.Username}");
 
         // Отправляем сообщение через Wildberries API
-        //await wild.SendMessage();
+        await wild.SendMessage();
 
         // Отправляем статистику через Wildberries API
         // await wild.SendStat();

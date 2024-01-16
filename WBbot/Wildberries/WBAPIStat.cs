@@ -181,7 +181,7 @@ internal class WBAPIStat
                     message += $"{count++}) {keyValuePairsBarcode[stock.barcode]} -- {stock.quantity} шт -- ({stock.warehouseName})\n";
                     all += stock.quantity;
                 }
-                message += $"Ежедневный платеж за складское храниение {all} рублей";
+                message += $"Ежедневный платеж за складское храниение {all*0.4} рублей";
                 // Возвращаем сформированное сообщение
                 return message;
             }
@@ -289,7 +289,7 @@ internal class WBAPIStat
                     if (item.isCancel == true) { continue; }
                     else
                     {
-                        message += $"{i++}) {item.date} -{keyValuePairsBarcode[item.barcode]} -- {item.priceWithDisc} руб, откуда: {item.warehouseName} куда {item.regionName}\n";
+                        message += $"{i++}) {item.date} -{keyValuePairsBarcode[item.barcode]} -- {item.priceWithDisc} р -- {item.regionName}\n";
                     }
                 }
 
@@ -331,7 +331,7 @@ internal class WBAPIStat
 
                 foreach (var item in orders)
                 {
-                    if (item.isCancel == true) { message += $"{i++}) {item.date} -{keyValuePairsBarcode[item.barcode]} -- {item.priceWithDisc} руб, откуда: {item.warehouseName} куда {item.regionName}\n"; }
+                    if (item.isCancel == true) { message += $"{i++}) {item.date} -{keyValuePairsBarcode[item.barcode]} -- {item.priceWithDisc} р {item.regionName}\n"; }
                     else
                     {
                         continue;
@@ -377,7 +377,7 @@ internal class WBAPIStat
 
             foreach (var item in sales)
             {
-                message += $"{i++}) {item.date} -{keyValuePairsBarcode[item.barcode]} -- {item.forPay} руб, откуда: {item.regionName}\n";
+                message += $"{i++}) {item.date} - {keyValuePairsBarcode[item.barcode]} -- {item.forPay} р -- {item.regionName}\n";
             }
 
             return message;
@@ -391,7 +391,7 @@ internal class WBAPIStat
             string token = "eyJhbGciOiJFUzI1NiIsImtpZCI6IjIwMjMxMjI1djEiLCJ0eXAiOiJKV1QifQ.eyJlbnQiOjEsImV4cCI6MTcxOTQ3MTY3OCwiaWQiOiI0ZjhkMmVkYi00NGNiLTRhYzAtODIwMi1iMzliMzI0MzBmNjEiLCJpaWQiOjU3Njc4NTE5LCJvaWQiOjE0MjIzMzMsInMiOjQsInNpZCI6ImM0MjM1MmRjLTVkYjktNGVjMi1hZDViLWQ0ZTc4YTgzZjZiMiIsInQiOmZhbHNlLCJ1aWQiOjU3Njc4NTE5fQ.03u83eEG9QpGgVuwYxR5dWOuezkqcMsU7P7xqwUXeMSomUbt7V8T0b95QcLLU0AKzhyJ1kkkvxBI41ndQMhiyw";
             // HttpContent content = new StringContent("{\r\n  \"period\": {\r\n    \"begin\": \"2023-12-01 20:05:32\",\r\n    \"end\": \"2023-12-26 20:05:32\"\r\n  },\r\n  \"page\": 1\r\n}");
             // устанавливаем заголовок 
-            string desiredTimeBegin = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day-1).ToString("yyyy-MM-dd HH:mm:ss");
+            string desiredTimeBegin = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day-3).ToString("yyyy-MM-dd HH:mm:ss");
             string  desiredTimeEnd = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day - 1, 23, 59, 59).ToString("yyyy-MM-dd HH:mm:ss");
             
             Period period = new Period() { begin = desiredTimeBegin, end = desiredTimeEnd };

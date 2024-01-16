@@ -74,44 +74,50 @@ namespace WBbot
                         var user = message.From;
                         if (message.Data == "Sales")
                         {
-                            await dBWorker.AddUser(user.Username, user.Id, message.Data);
+                            
                             var s = await APIStat.GetAllSales(DateTime.Now.AddDays(-7));
                             await botClient.SendTextMessageAsync(user.Id, s);
+                            await dBWorker.AddUser(user.Username, user.Id, message.Data, s);
                             break;
                         }
                         if (message.Data == "Остатки")
                         {
-                            await dBWorker.AddUser(user.Username, user.Id, message.Data);
+                            
                             var s = await APIStat.GetStocks();
                             await botClient.SendTextMessageAsync(user.Id, s);
+                            await dBWorker.AddUser(user.Username, user.Id, message.Data, s);
                             break;
                         }
                         if (message.Data == "incomes")
                         {
-                            await dBWorker.AddUser(user.Username, user.Id, message.Data);
+                            
                             var s = await APIStat.GetIncomes();
                             await botClient.SendTextMessageAsync(user.Id, s);
+                            await dBWorker.AddUser(user.Username, user.Id, message.Data, s);
                             break;
                         }
                         if (message.Data == "Anal")
                         {
-                            await dBWorker.AddUser(user.Username, user.Id, message.Data);
+                            
                             var s = await APIStat.AnalyticReport();
                             await botClient.SendTextMessageAsync(user.Id, s);
+                            await dBWorker.AddUser(user.Username, user.Id, message.Data, s);
                             break;
                         }
                         if (message.Data == "stat_order")
                         {
-                            await dBWorker.AddUser(user.Username, user.Id, message.Data);
+                            
                             var s = await APIStat.GetAllOrders(DateTime.Now.AddDays(-7));
                             await botClient.SendTextMessageAsync(user.Id, s);
+                            await dBWorker.AddUser(user.Username, user.Id, message.Data, s);
                             break;
                         }
                         if (message.Data == "isCancel")
                         {
-                            await dBWorker.AddUser(user.Username, user.Id, message.Data);
+                            
                             var s = await APIStat.GetAllOrdersCancel(DateTime.Now.AddDays(-30));
                             await botClient.SendTextMessageAsync(user.Id, s);
+                            await dBWorker.AddUser(user.Username, user.Id, message.Data, s);
                             break;
                         }
 

@@ -14,20 +14,21 @@ namespace WBbot.DataBase
 
         }
 
-        public async Task AddUser(string? userName, long userId, string action)
+        public async Task AddUser(string? userName, long userId, string action, string message)
         {
             try
             {
                 await using (var connection = new SqliteConnection(connectionString))
                 {
                     connection.Open();
-                    string sqlExpression = "INSERT INTO Users (Name, Id, Date_insert, Action) VALUES (@Name, @Id, @Date_insert, @Action)";
+                    string sqlExpression = "INSERT INTO Users (Name, Id, Date_insert, Action, Message) VALUES (@Name, @Id, @Date_insert, @Action, @Message)";
                     SqliteCommand command = new SqliteCommand(sqlExpression, connection);
                     // создаем параметр для сообщения
                     command.Parameters.Add(new SqliteParameter("@Name", userName == null ? "NULL" : userName));
                     command.Parameters.Add(new SqliteParameter("@Id", userId));
                     command.Parameters.Add(new SqliteParameter("@Date_insert", DateTime.Now.ToString("g")));
                     command.Parameters.Add(new SqliteParameter("@Action", action));
+                    command.Parameters.Add(new SqliteParameter("@Message", message));
                     command.ExecuteNonQuery();
                 }
             }
