@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-namespace WBbot
+namespace WBbot.Configuration
 {
     internal class Configuration
     {
@@ -15,10 +15,10 @@ namespace WBbot
         {
             IConfigurationBuilder builder = new ConfigurationBuilder().AddJsonFile("appsettings.json", false, true);
             Iconfiguration = builder.Build();
-            this.TelegramToken = Iconfiguration["TelegramToken"];
-            this.WildberriesToken = Iconfiguration["WildberriesToken"];
-            this.WildberriesTokenStat = Iconfiguration["WildberriesTokenStat"];
-            this.ConnectionStrings = Iconfiguration["ConnectionStrings"];
+            TelegramToken = Iconfiguration["TelegramToken"];
+            WildberriesToken = Iconfiguration["WildberriesToken"];
+            WildberriesTokenStat = Iconfiguration["WildberriesTokenStat"];
+            ConnectionStrings = Iconfiguration["ConnectionStrings"];
 
         }
     }

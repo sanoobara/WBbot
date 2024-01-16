@@ -1,5 +1,6 @@
 ﻿using Telegram.Bot;
 using WBbot;
+using WBbot.Configuration;
 using WBbot.Wildberries;
 using WBbot.Wildberries.Marketplace;
 
