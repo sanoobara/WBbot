@@ -30,7 +30,6 @@ internal class WBAPIStat
 
     }
 
-
     public async Task<string?> SendStat(DateTime dateTime)
     {
         using (var client = new HttpClient())
@@ -60,7 +59,6 @@ internal class WBAPIStat
 
         }
     }
-
 
     public async Task<string?> SendReport(DateTime dateTimeFrom, DateTime dateTimeTO)
     {
@@ -123,7 +121,6 @@ internal class WBAPIStat
         }
     }
 
-
     // Получение информации об остатках на складе
     public async Task<string?> GetStocks()
     {
@@ -168,6 +165,7 @@ internal class WBAPIStat
 
                 //Общий счетчик остатков на складе
                 int all = 0;
+                int Cost = 0;
 
                 // Перебираем элементы списка stocks
                 foreach (var stock in stocks)
@@ -175,11 +173,16 @@ internal class WBAPIStat
                     // Проверяем, если количество равно нулю, переходим к следующей итерации цикла
                     if (stock.quantity == 0) { continue; }
 
+                    //Посчитаешь стоимость склада
+
+                    Cost += stock.quantity * stock.Price;
+
                     // Добавляем в сообщение информацию о каждом элементе в формате: Номер) Название -- Количество шт -- Название склада
                     message += $"{count++}) {keyValuePairsBarcode[stock.barcode]} -- {stock.quantity} шт -- ({stock.warehouseName})\n";
                     all += stock.quantity;
                 }
-                message += $"Ежедневный платеж за складское храниение {all} рублей";
+                message += $"Ежедневный платеж за складское храниение {all} рублей\n";
+                message += $"Стоимость склада {Cost}";
                 // Возвращаем сформированное сообщение
                 return message;
             }
@@ -192,7 +195,6 @@ internal class WBAPIStat
             }
         }
     }
-
 
     public async Task<string?> GetIncomes()
     {
@@ -300,6 +302,7 @@ internal class WBAPIStat
             return exception.Message;
         }
     }
+    
     public async Task<string?> GetAllOrdersCancel(DateTime dateTime)
     {
         var url = "https://statistics-api.wildberries.ru/api/v1/supplier/orders";
@@ -329,7 +332,7 @@ internal class WBAPIStat
 
             foreach (var item in orders)
             {
-                if (item.isCancel == true) { message += $"{i++}) {item.date} -{keyValuePairs[item.barcode]} -- {item.priceWithDisc} руб, откуда: {item.warehouseName} куда {item.regionName}\n"; }
+                if (item.isCancel == true) { message += $"{i++}) {item.date} ({item.lastChangeDate}) - {keyValuePairsBarcode[item.barcode]} -- {item.priceWithDisc} р. {item.regionName}\n"; }
                 else
                 {
                     continue;
@@ -375,7 +378,7 @@ internal class WBAPIStat
 
             foreach (var item in sales)
             {
-                message += $"{i++}) {item.date} -{keyValuePairsBarcode[item.barcode]} -- {item.forPay} руб, откуда: {item.regionName}\n";
+                message += $"{i++}) {item.date} -{keyValuePairsBarcode[item.barcode]} -- {item.forPay} р., откуда: {item.regionName}\n";
             }
 
             return message;

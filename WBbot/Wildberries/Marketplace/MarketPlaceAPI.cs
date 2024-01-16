@@ -16,7 +16,7 @@ namespace WBbot.Wildberries.Marketplace
             Token = token;
             TokenStat = tokenStat;
             //this.botClient = botClient;
-            using (StreamReader sr = new StreamReader("Barcode.json"))
+            using (StreamReader sr = new StreamReader("Wildberries\\Barcode.json"))
             {
                 keyValuePairs = JsonConvert.DeserializeObject<Dictionary<string, string>>(sr.ReadToEnd());
             }
