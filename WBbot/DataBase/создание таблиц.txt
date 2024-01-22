@@ -1,0 +1,10 @@
+﻿CREATE TABLE "MarketOrders" (
+	"id"	INTEGER,
+	"name"	TEXT,
+	"date_create"	TEXT,
+	"date_insert"	TEXT,
+	"convertPrice"	INTEGER,
+	"price"	INTEGER,
+	"article"	INTEGER,
+	PRIMARY KEY("id")
+);

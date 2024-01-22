@@ -17,11 +17,33 @@ class Program
         //ILogger logger = factory.CreateLogger("Program");
         //logger.LogInformation("Hello World! Logging is {Description}.", "fun");
 
+        //var configuration = new ConfigurationBuilder()
+        //        .SetBasePath(Directory.GetCurrentDirectory())
+        //        .AddJsonFile("appsettings.json")
+        //        .Build();
+
+
+
+
+
+        // Log.Logger = new LoggerConfiguration()
+        //.WriteTo.Console()
+        //.CreateBootstrapLogger();
+
+        // Log.Information("Starting up!");
+
+
+
+
+
+
+
+
         // Создаем объект для работы с конфигурацией
         Configuration configuration = new Configuration();
 
         // Инициализируем экземпляры классов для работы с Wildberries API и Stat
-        MarketPlaceAPI wild = new MarketPlaceAPI(configuration.WildberriesToken, configuration.WildberriesTokenStat);
+
         WBAPIStat stat = new WBAPIStat(configuration.WildberriesTokenStat);
 
         // Инициализируем строку для подключения к базе данных
@@ -32,7 +54,7 @@ class Program
 
         // Инициализируем объект BotWorker для работы с Telegram Bot API
         BotWorker botWorker = new BotWorker(configuration.TelegramToken, cts, connectionString);
-
+        MarketPlaceAPI wild = new MarketPlaceAPI(configuration.WildberriesToken, connectionString, botWorker.botClient);
         // Передаем экземпляры классов APIWild и WBAPIStat внутрь объекта botWorker
         botWorker.APIWild = wild;
         botWorker.APIStat = stat;

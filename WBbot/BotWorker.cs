@@ -54,7 +54,7 @@ namespace WBbot
         //}
 
         async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
-        {           
+        {
             switch (update.Type)
             {
                 case UpdateType.Message:
@@ -75,7 +75,7 @@ namespace WBbot
                         var user = message.From;
                         if (message.Data == "Sales")
                         {
-                            
+
                             var s = await APIStat.GetAllSales(DateTime.Now.AddDays(-7));
                             await botClient.SendTextMessageAsync(user.Id, s);
                             await dBWorker.AddUser(user.Username, user.Id, message.Data, s);
@@ -83,7 +83,7 @@ namespace WBbot
                         }
                         if (message.Data == "Остатки")
                         {
-                            
+
                             var s = await APIStat.GetStocks();
                             await botClient.SendTextMessageAsync(user.Id, s);
                             await dBWorker.AddUser(user.Username, user.Id, message.Data, s);
@@ -91,7 +91,7 @@ namespace WBbot
                         }
                         if (message.Data == "incomes")
                         {
-                            
+
                             var s = await APIStat.GetIncomes();
                             await botClient.SendTextMessageAsync(user.Id, s);
                             await dBWorker.AddUser(user.Username, user.Id, message.Data, s);
@@ -99,7 +99,7 @@ namespace WBbot
                         }
                         if (message.Data == "Anal")
                         {
-                            
+
                             var s = await APIStat.AnalyticReport();
                             await botClient.SendTextMessageAsync(user.Id, s);
                             await dBWorker.AddUser(user.Username, user.Id, message.Data, s);
@@ -107,7 +107,7 @@ namespace WBbot
                         }
                         if (message.Data == "stat_order")
                         {
-                            
+
                             var s = await APIStat.GetAllOrders(DateTime.Now.AddDays(-7));
                             await botClient.SendTextMessageAsync(user.Id, s);
                             await dBWorker.AddUser(user.Username, user.Id, message.Data, s);
@@ -115,7 +115,7 @@ namespace WBbot
                         }
                         if (message.Data == "isCancel")
                         {
-                            
+
                             var s = await APIStat.GetAllOrdersCancel(DateTime.Now.AddDays(-30));
                             await botClient.SendTextMessageAsync(user.Id, s);
                             await dBWorker.AddUser(user.Username, user.Id, message.Data, s);
@@ -144,7 +144,7 @@ namespace WBbot
             // first row
             new []
             {
-                
+
                 InlineKeyboardButton.WithCallbackData(text: "Sales", callbackData: "Sales"),
                 InlineKeyboardButton.WithCallbackData(text: "Остатки", callbackData: "Остатки"),
 

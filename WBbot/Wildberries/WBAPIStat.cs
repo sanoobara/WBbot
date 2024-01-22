@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
 using System.Net.Http.Json;
+using WBbot.Wildberries.Statistic.Orders;
 
 namespace WBbot.Wildberries;
 
@@ -297,16 +297,17 @@ internal class WBAPIStat
             }
         }
         catch (Exception exception)
-        {           
+        {
             Console.WriteLine(exception.Message);
             return exception.Message;
         }
     }
-    
+
     public async Task<string?> GetAllOrdersCancel(DateTime dateTime)
     {
         var url = "https://statistics-api.wildberries.ru/api/v1/supplier/orders";
-        try {
+        try
+        {
             // Create HttpClient with using statement to ensure proper disposal
             using (var client = new HttpClient())
             {
@@ -330,14 +331,14 @@ internal class WBAPIStat
 
                 message += $"Отчетное время: {dateTime.ToString("g")}\n";
 
-            foreach (var item in orders)
-            {
-                if (item.isCancel == true) { message += $"{i++}) {item.date} ({item.lastChangeDate}) - {keyValuePairsBarcode[item.barcode]} -- {item.priceWithDisc} р. {item.regionName}\n"; }
-                else
+                foreach (var item in orders)
                 {
-                    continue;
+                    if (item.isCancel == true) { message += $"{i++}) {item.date} ({item.lastChangeDate}) - {keyValuePairsBarcode[item.barcode]} -- {item.priceWithDisc} р. {item.regionName}\n"; }
+                    else
+                    {
+                        continue;
+                    }
                 }
-            }
 
                 return message;
             }
@@ -392,9 +393,9 @@ internal class WBAPIStat
             string token = "eyJhbGciOiJFUzI1NiIsImtpZCI6IjIwMjMxMjI1djEiLCJ0eXAiOiJKV1QifQ.eyJlbnQiOjEsImV4cCI6MTcxOTQ3MTY3OCwiaWQiOiI0ZjhkMmVkYi00NGNiLTRhYzAtODIwMi1iMzliMzI0MzBmNjEiLCJpaWQiOjU3Njc4NTE5LCJvaWQiOjE0MjIzMzMsInMiOjQsInNpZCI6ImM0MjM1MmRjLTVkYjktNGVjMi1hZDViLWQ0ZTc4YTgzZjZiMiIsInQiOmZhbHNlLCJ1aWQiOjU3Njc4NTE5fQ.03u83eEG9QpGgVuwYxR5dWOuezkqcMsU7P7xqwUXeMSomUbt7V8T0b95QcLLU0AKzhyJ1kkkvxBI41ndQMhiyw";
             // HttpContent content = new StringContent("{\r\n  \"period\": {\r\n    \"begin\": \"2023-12-01 20:05:32\",\r\n    \"end\": \"2023-12-26 20:05:32\"\r\n  },\r\n  \"page\": 1\r\n}");
             // устанавливаем заголовок 
-            string desiredTimeBegin = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day-3).ToString("yyyy-MM-dd HH:mm:ss");
-            string  desiredTimeEnd = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day - 1, 23, 59, 59).ToString("yyyy-MM-dd HH:mm:ss");
-            
+            string desiredTimeBegin = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day - 3).ToString("yyyy-MM-dd HH:mm:ss");
+            string desiredTimeEnd = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day - 1, 23, 59, 59).ToString("yyyy-MM-dd HH:mm:ss");
+
             Period period = new Period() { begin = desiredTimeBegin, end = desiredTimeEnd };
             Request request = new Request() { page = 1, period = period };
 
