@@ -138,8 +138,8 @@
         public int discountPercent { get; set; }
         public int spp { get; set; }
         public double forPay { get; set; }
-        public int finishedPrice { get; set; }
-        public int priceWithDisc { get; set; }
+        public double finishedPrice { get; set; }
+        public double priceWithDisc { get; set; }
         public string saleID { get; set; }
         public string orderType { get; set; }
         public string sticker { get; set; }
