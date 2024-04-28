@@ -1,4 +1,6 @@
-﻿using Telegram.Bot;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Telegram.Bot;
 using WBbot;
 using WBbot.Configuration;
 using WBbot.Wildberries;
@@ -7,7 +9,7 @@ using WBbot.Wildberries.Marketplace;
 
 class Program
 {
-
+    
     static async Task Main()
     {
         //var builder = WebApplication.CreateBuilder();
@@ -33,9 +35,21 @@ class Program
         // Log.Information("Starting up!");
 
 
+        //ILoggerFactory factory = new LoggerFactory();
+        //ILogger<BotWorker> logger = factory.CreateLogger<BotWorker>();
 
 
+        IServiceCollection services = new ServiceCollection();
+        ConfigureServices(services);
+        IServiceProvider serviceProvider = services.BuildServiceProvider();
+        ILogger<Program> logger = serviceProvider.GetService<ILogger<Program>>();
 
+        //logger.LogInformation("Пример информационного сообщения");
+        //logger.LogWarning("Пример предупреждения");
+        //logger.LogError("Пример ошибки");
+        //logger.LogCritical("Пример критической ошибки");
+
+       
 
 
 

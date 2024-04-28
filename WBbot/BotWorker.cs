@@ -1,4 +1,6 @@
-﻿using Telegram.Bot;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -12,6 +14,7 @@ namespace WBbot
 {
     internal class BotWorker
     {
+        ILogger Logger;
 
         public TelegramBotClient botClient;
         DBWorker dBWorker;
@@ -21,6 +24,9 @@ namespace WBbot
 
         public BotWorker(string Token, CancellationTokenSource cts, string connectionString)
         {
+
+           
+
 
             botClient = new TelegramBotClient(Token);
             this.cts = cts;
@@ -39,6 +45,8 @@ namespace WBbot
                 receiverOptions: receiverOptions,
                 cancellationToken: cts.Token
             );
+            //logger.LogInformation("Пример информационного сообщения");
+
         }
 
         //async Task Starting(User user)

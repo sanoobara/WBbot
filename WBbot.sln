@@ -5,10 +5,6 @@ VisualStudioVersion = 17.7.34302.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WBbot", "WBbot\WBbot.csproj", "{934A4A51-2F07-4B7A-B04D-D6ED180364C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp", "WpfApp\WpfApp.csproj", "{9ED500E3-27EB-48DD-84B0-A352FDAAC8C4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp3", "ConsoleApp3\ConsoleApp3.csproj", "{056CF12E-CB2B-452F-AFEF-6BC28D62A5B9}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,14 +15,6 @@ Global
 		{934A4A51-2F07-4B7A-B04D-D6ED180364C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{934A4A51-2F07-4B7A-B04D-D6ED180364C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{934A4A51-2F07-4B7A-B04D-D6ED180364C1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9ED500E3-27EB-48DD-84B0-A352FDAAC8C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9ED500E3-27EB-48DD-84B0-A352FDAAC8C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9ED500E3-27EB-48DD-84B0-A352FDAAC8C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9ED500E3-27EB-48DD-84B0-A352FDAAC8C4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{056CF12E-CB2B-452F-AFEF-6BC28D62A5B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{056CF12E-CB2B-452F-AFEF-6BC28D62A5B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{056CF12E-CB2B-452F-AFEF-6BC28D62A5B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{056CF12E-CB2B-452F-AFEF-6BC28D62A5B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
